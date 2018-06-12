@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+
+    client:
+        build: src/client
+        image: client
+        networks:
+            - overlay
+        environment: 
+            - IN_DOCKER="InDocker"
+        depends_on:
+            - "server"
+
+    server:
+        build: src/server
+        image: server
+        networks:
+            - overlay
+
+networks:
+  overlay:
