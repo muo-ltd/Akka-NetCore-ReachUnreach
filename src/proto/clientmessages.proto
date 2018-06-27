@@ -1,0 +1,11 @@
+syntax = "proto3";
+package Client;
+
+message ClientMessages {
+    message DummyRequest {
+        int32 Size = 1;
+        int32 NoMessages = 2;
+    }
+    message DummyResponse {}
+}
+

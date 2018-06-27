@@ -1,0 +1,23 @@
+syntax = "proto3";
+package Server;
+
+import 'timestamp.proto';
+
+message ServerMessages {
+    message StreamedDataRequest {
+        int32 Size = 1;
+        int32 NoMessages = 2;
+    }
+    message StreamedDataResponse {
+        message Payload {
+            google.protobuf.Timestamp Date = 1;
+            int32 VertextA = 2;
+            int32 VertextB = 3;
+            double Cost = 4;
+        }
+
+        repeated Payload Responses = 5;
+    }
+    message StreamedDataComplete {}
+}
+

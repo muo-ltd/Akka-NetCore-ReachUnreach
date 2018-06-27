@@ -3,28 +3,15 @@ using System.Diagnostics;
 using Akka.Actor;
 using Akka.Cluster.Sharding;
 using Akka.Event;
+using static Client.ClientMessages.Types;
+using static Server.ServerMessages.Types;
 
 namespace Client
 {
     public partial class ClientActor :  ReceiveActor
     {
-        public class DummyRequest 
-        {
-            public int Size { get; }
-            public int NoMessages  { get; }
-
-            public DummyRequest(int size, int noMessages)
-            {
-                Size = size;
-                NoMessages = noMessages;
-            }
-        }
-        public class DummyResponse {} 
-
         private readonly ILoggingAdapter _log = Context.GetLogger();
-
         private MessageProcessor _processor;
-
         private IActorRef _origonalActor; 
         private int _count;
         private Stopwatch _totalTimer;
@@ -34,8 +21,8 @@ namespace Client
             _processor = new MessageProcessor();
 
             Receive<DummyRequest>(x => Handle(x));
-            Receive<Server.TestEntity.StreamedDataResponse>(x => Handle(x));
-            Receive<Server.TestEntity.StreamedDataComplete>(x => Handle(x));
+            Receive<StreamedDataResponse>(x => Handle(x));
+            Receive<StreamedDataComplete>(x => Handle(x));
         }
 
         public void Handle(DummyRequest req)
@@ -43,7 +30,7 @@ namespace Client
             _origonalActor = Sender;
             var shardRegion = ClusterSharding.Get(Context.System).ShardRegion("testregion");
 
-            var message = new Server.TestEntity.StreamedDataRequest(req.Size, req.NoMessages);
+            var message = new StreamedDataRequest(req.Size, req.NoMessages);
             var envelope = new Server.Envelope(1, message);
 
             shardRegion.Tell(envelope);
@@ -55,7 +42,7 @@ namespace Client
             _log.Info("Handled DummyRequest");
         }
 
-        public void Handle(Server.TestEntity.StreamedDataResponse res)
+        public void Handle(StreamedDataResponse res)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
@@ -73,7 +60,7 @@ namespace Client
             }
         }
 
-        public void Handle(Server.TestEntity.StreamedDataComplete res)
+        public void Handle(StreamedDataComplete res)
         {
             _totalTimer.Stop();
             _log.Info($"Complete: {_totalTimer.Elapsed.TotalSeconds} seconds");

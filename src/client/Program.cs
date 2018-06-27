@@ -9,6 +9,7 @@ using Akka.Actor;
 using Akka.Cluster.Sharding;
 using Akka.Configuration;
 using Server;
+using static Client.ClientMessages.Types;
 
 namespace Client
 {
@@ -34,14 +35,6 @@ namespace Client
             var hcon = @"akka {
                                 actor {
                                         provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"" 
-                                
-                                        serializers {
-                                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
-                                        }
-            
-                                        serialization-bindings {
-                                            ""System.Object"" = hyperion
-                                        }
                                 }
                                 
                                 remote {
@@ -80,15 +73,16 @@ namespace Client
 
 
             var clientActor = _clusterSystem.ActorOf(ClientActor.Props(), "client");
-            clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest(0, 5000)).Wait(); //Warm up 
+
+            clientActor.Ask<DummyResponse>(new DummyRequest(0, 5000)).Wait(); //Warm up 
             
-            clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest(0, 100000)).Wait(); //0
-            clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest(1, 100000)).Wait(); //1 
-            clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest(10, 100000)).Wait(); //10
-            clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest(100, 100000)).Wait();//100
+            clientActor.Ask<DummyResponse>(new DummyRequest(0, 100000)).Wait(); //0
+            clientActor.Ask<DummyResponse>(new DummyRequest(1, 100000)).Wait(); //1 
+            clientActor.Ask<DummyResponse>(new DummyRequest(10, 100000)).Wait(); //10
+            clientActor.Ask<DummyResponse>(new DummyRequest(100, 100000)).Wait();//100
             
-            clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest(0, 1000000)).Wait(); //10
-            clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest(0, 10000000)).Wait();//100
+            clientActor.Ask<DummyResponse>(new DummyRequest(0, 1000000)).Wait(); //10
+            clientActor.Ask<DummyResponse>(new DummyRequest(0, 10000000)).Wait();//100
             
             AssemblyLoadContext.Default.Unloading += (obj) => 
             {
