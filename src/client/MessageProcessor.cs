@@ -16,7 +16,7 @@ namespace Client
     {
         public void DoSomeWork()
         {
-            const int max = 5000;
+            const int max = 1000;
 
             //Bad prime code
             var noPrime = new List<int>();
